@@ -1,0 +1,52 @@
+-- Creating TBL_STOCK table
+CREATE TABLE TBL_STOCK (
+    Product_ID VARCHAR2(6) PRIMARY KEY,
+    Product_Name VARCHAR2(20) UNIQUE,
+    Quantity_On_Hand NUMBER CHECK (Quantity_On_Hand >= 0),
+    Product_Unit_Price NUMBER CHECK (Product_Unit_Price >= 0),
+    Reorder_Level NUMBER CHECK (Reorder_Level >= 0)
+);
+
+-- Creating TBL_SALES table
+CREATE TABLE TBL_SALES (
+    Sales_ID VARCHAR2(6) PRIMARY KEY,
+    Sales_Date DATE,
+    Product_ID VARCHAR2(6),
+    Quantity_Sold NUMBER CHECK (Quantity_Sold >= 0),
+    Sales_Price_Per_Unit NUMBER CHECK (Sales_Price_Per_Unit >= 0),
+    FOREIGN KEY (Product_ID) REFERENCES TBL_STOCK(Product_ID)
+);
+
+
+INSERT INTO TBL_STOCK (Product_ID, Product_Name, Quantity_On_Hand, Product_Unit_Price, Reorder_Level)
+VALUES ('RE1001', 'REDMI Note 3', 20, 12000, 5);
+
+INSERT INTO TBL_STOCK (Product_ID, Product_Name, Quantity_On_Hand, Product_Unit_Price, Reorder_Level)
+VALUES ('ip1002', 'Iphone 5S', 10, 21000, 2);
+
+INSERT INTO TBL_STOCK (Product_ID, Product_Name, Quantity_On_Hand, Product_Unit_Price, Reorder_Level)
+VALUES ('PA1003', 'Panasonic P55', 50, 5500, 5);
+
+
+CREATE SEQUENCE SEQ_SALES_ID
+    START WITH 1000
+    INCREMENT BY 1;
+
+CREATE SEQUENCE SEQ_PRODUCT_ID
+    START WITH 1004
+    INCREMENT BY 1;
+
+
+CREATE VIEW V_SALES_REPORT AS
+SELECT s.Sales_ID,
+       s.Sales_Date,
+       s.Product_ID,
+       t.Product_Name,
+       s.Quantity_Sold,
+       t.Product_Unit_Price,
+       s.Sales_Price_Per_Unit,
+       (s.Sales_Price_Per_Unit - t.Product_Unit_Price) AS Profit_Amount
+FROM TBL_SALES s
+JOIN TBL_STOCK t ON s.Product_ID = t.Product_ID
+ORDER BY Profit_Amount DESC, s.Sales_ID ASC;
+
